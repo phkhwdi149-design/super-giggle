@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คุณบัวบิวตี้ - เครื่องคิดและวิเคราะห์เลขหวย</title>
+    <style>
+        body { font-family: 'Tahoma', sans-serif; background-color: #fce4ec; margin: 0; padding: 20px; }
+        .container { max-width: 650px; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin: 0 auto; }
+        h1, h2, h3 { text-align: center; color: #d81b60; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 20px; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; font-size: 14px; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 15px; }
+        .row { display: flex; gap: 10px; }
+        .col { flex: 1; }
+        button { width: 100%; background: #d81b60; color: white; border: none; padding: 12px; border-radius: 6px; font-size: 15px; cursor: pointer; font-weight: bold; margin-top: 5px; }
+        button:hover { background: #ad1457; }
+        .calc-box { background: #fff8e1; padding: 15px; border-radius: 8px; border: 1px solid #ffe082; margin-bottom: 20px; }
+        .result-box { background: #e8f5e9; padding: 15px; border-radius: 8px; border: 1px solid #a5d6a7; margin-top: 15px; }
+        .result-title { font-weight: bold; color: #2e7d32; margin-bottom: 5px; }
+        .num-tag { display: inline-block; background: #e91e63; color: white; padding: 4px 10px; border-radius: 15px; margin: 3px; font-weight: bold; }
+        .logout-btn { background: #757575; margin-top: 15px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- หน้าเข้าสู่ระบบ -->
+    <div id="loginPage">
+        <h1>💄 คุณบัวบิวตี้ 💄</h1>
+        <div class="subtitle">ระบบวิเคราะห์และคิดคำนวณสูตรเลขหวย</div>
+        <div class="form-group">
+            <label>ชื่อผู้ใช้งาน หรือ เบอร์โทรศัพท์:</label>
+            <input type="text" id="userInput" placeholder="กรอกชื่อหรือเบอร์โทรศัพท์">
+        </div>
+        <button onclick="login()">เข้าสู่ระบบ</button>
+    </div>
+
+    <!-- หน้าโปรแกรมหลัก -->
+    <div id="mainPage" class="hidden">
+        <h2>💄 คุณบัวบิวตี้ 💄</h2>
+        <div class="subtitle">ผู้ใช้งาน: <span id="currentUser" style="color:#d81b60; font-weight:bold;"></span></div>
+        <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
+
+        <!-- โหมด 1: คำนวณสูตรจากงวดเก่า -->
+        <div class="calc-box">
+            <h3 style="margin-top:0; color:#e65100;">🧮 1. คำนวณสูตรเลขเด็ด (จากงวดล่าสุด)</h3>
+            <div class="row">
+                <div class="col">
+                    <label>รางวัลที่ 1 (6 ตัว):</label>
+                    <input type="number" id="lastFirst" placeholder="เช่น 123456">
+                </div>
+                <div class="col">
+                    <label>2 ตัวล่าง (2 ตัว):</label>
+                    <input type="number" id="last2Down" placeholder="เช่น 78">
+                </div>
+            </div>
+            <button onclick="calculateFormula()">คำนวณหาเลขเด่นงวดนี้</button>
+            <div id="formulaResult" class="hidden"></div>
+        </div>
+
+        <!-- โหมด 2: กระจายเลขกลับ / 6 ประตู -->
+        <div class="calc-box" style="background:#f3e5f5; border-color:#ce93d8;">
+            <h3 style="margin-top:0; color:#4a148c;">🔄 2. คำนวณเลขกลับ / สลับหลัก (กลับประตู)</h3>
+            <div class="form-group">
+                <label>ใส่เลขที่ต้องการกลับ (2 ตัว หรือ 3 ตัว):</label>
+                <input type="number" id="swapInput" placeholder="เช่น 123 หรือ 45">
+            </div>
+            <button onclick="calculateSwap()" style="background:#7b1fa2;">กระจายเลขกลับทั้งหมด</button>
+            <div id="swapResult" class="hidden"></div>
+        </div>
+
+        <!-- โหมด 3: จับคู่เลขเด่น -->
+        <div class="calc-box" style="background:#e0f2f1; border-color:#80cbd3;">
+            <h3 style="margin-top:0; color:#004d40;">🎲 3. จับคู่เลขเด่น (ประกบชุด 2 ตัว)</h3>
+            <div class="form-group">
+                <label>ใส่ตัวเลขเด่นที่ได้มา (ติดกันโดยไม่ต้องเว้นวรรค):</label>
+                <input type="number" id="pairInput" placeholder="เช่น 1479">
+            </div>
+            <button onclick="calculatePair()" style="background:#00695c;">จับคู่ 2 ตัวทั้งหมด</button>
+            <div id="pairResult" class="hidden"></div>
+        </div>
+
+        <button onclick="logout()" class="logout-btn">ออกจากระบบ</button>
+    </div>
+</div>
+
+<script>
+    let loggedUser = localStorage.getItem('loggedUser') || '';
+    if (loggedUser) showMainPage();
+
+    function login() {
+        const input = document.getElementById('userInput').value.trim();
+        if (!input) return alert('กรุณากรอกชื่อหรือเบอร์โทรศัพท์');
+        loggedUser = input;
+        localStorage.setItem('loggedUser', loggedUser);
+        showMainPage();
+    }
+
+    function logout() {
+        localStorage.removeItem('loggedUser');
+        document.getElementById('loginPage').classList.remove('hidden');
+        document.getElementById('mainPage').classList.add('hidden');
+    }
+
+    function showMainPage() {
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('mainPage').classList.remove('hidden');
+        document.getElementById('currentUser').innerText = loggedUser;
+    }
+
+    // 1. สูตรคำนวณหวย
+    function calculateFormula() {
+        const first = document.getElementById('lastFirst').value.trim();
+        const down = document.getElementById('last2Down').value.trim();
+
+        if (first.length !== 6 || down.length !== 2) {
+            return alert('กรุณากรอก รางวัลที่ 1 ให้ครบ 6 หลัก และ 2 ตัวล่าง 2 หลัก');
+        }
+
+        // ตัวอย่างสูตรคำนวณ (นำหลักต่างๆ มาบวกกัน)
+        let d1 = parseInt(first[0]), d2 = parseInt(first[1]), d3 = parseInt(first[2]);
+        let d4 = parseInt(first[3]), d5 = parseInt(first[4]), d6 = parseInt(first[5]);
+        let b1 = parseInt(down[0]), b2 = parseInt(down[1]);
+
+        let run1 = (d5 + d6 + b2) % 10;
+        let run2 = (run1 + 3) % 10;
+        let run3 = (run1 + 7) % 10;
+
+        let resDiv = document.getElementById('formulaResult');
+        resDiv.classList.remove('hidden');
+        resDiv.innerHTML = `
+            <div class="result-box">
+                <div class="result-title">🎯 ผลการคำนวณสูตรเด่น:</div>
+                <div><b>เลขเด่น/วิ่ง (3 ตัว):</b> 
+                    <span class="num-tag">${run1}</span>
+                    <span class="num-tag">${run2}</span>
+                    <span class="num-tag">${run3}</span>
+                </div>
+                <div style="margin-top:8px;"><b>แนวทาง 2 ตัวจับคู่:</b> 
+                    <span class="num-tag">${run1}${run2}</span>
+                    <span class="num-tag">${run1}${run3}</span>
+                    <span class="num-tag">${run2}${run3}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    // 2. คำนวณเลขกลับ (ประตู)
+    function calculateSwap() {
+        const input = document.getElementById('swapInput').value.trim();
+        let results = new Set();
+
+        if (input.length === 2) {
+            results.add(input);
+            results.add(input[1] + input[0]);
+        } else if (input.length === 3) {
+            let p = input.split('');
+            // Permutation 3 ตัว
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    for (let k = 0; k < 3; k++) {
+                        if (i !== j && j !== k && i !== k) {
+                            results.add(p[i] + p[j] + p[k]);
+                        }
+                    }
+                }
+            }
+        } else {
+            return alert('กรุณากรอกตัวเลข 2 หรือ 3 หลักเท่านั้น');
+        }
+
+        let resDiv = document.getElementById('swapResult');
+        resDiv.classList.remove('hidden');
+        let tags = Array.from(results).map(n => `<span class="num-tag">${n}</span>`).join('');
+        resDiv.innerHTML = `
+            <div class="result-box">
+                <div class="result-title">🔄 กระจายได้ทั้งหมด (${results.size} ชุด):</div>
+                <div>${tags}</div>
+            </div>
+        `;
+    }
+
+    // 3. จับคู่เลขเด่น
+    function calculatePair() {
+        const input = document.getElementById('pairInput').value.trim();
+        if (input.length < 2) return alert('กรุณากรอกเลขเด่นอย่างน้อย 2 ตัว');
+
+        let digits = input.split('');
+        let pairs = [];
+
+        for (let i = 0; i < digits.length; i++) {
+            for (let j = i + 1; j < digits.length; j++) {
+                pairs.push(digits[i] + digits[j]);
+            }
+        }
+
+        let resDiv = document.getElementById('pairResult');
+        resDiv.classList.remove('hidden');
+        let tags = pairs.map(n => `<span class="num-tag">${n}</span>`).join('');
+        resDiv.innerHTML = `
+            <div class="result-box">
+                <div class="result-title">🎲 จับคู่ 2 ตัวได้ทั้งหมด (${pairs.length} ชุด):</div>
+                <div>${tags}</div>
+            </div>
+        `;
+    }
+</script>
+
+</body>
+</html>
